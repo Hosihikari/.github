@@ -1,4 +1,4 @@
-# 星光投影（Hosihikari Projection）
+# 星光 · 星光投影
 
 <table align="right">
   <tr>
