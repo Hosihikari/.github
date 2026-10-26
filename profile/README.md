@@ -1,4 +1,4 @@
-# Hosihikari Bindings
+# Hosihikari Projection
 
 <table align="right">
   <tr>
@@ -11,9 +11,9 @@
 
 [English](README.md) | [简体中文](README.zh_hans.md)
 
-Generated .NET bindings for the Minecraft Bedrock APIs. A libTooling frontend turns C++ declarations and debug symbols into a versioned intermediate representation; emitters turn that IR into a native-style Interop assembly and a C ABI shim, which the shim loader resolves at run time by module offset, vtable slot, or exported symbol.
+Hosihikari Projection (星光投影) projects the Minecraft Bedrock native APIs into .NET bindings. It owns the native-to-C-ABI and native-to-managed projection only; plugin lifecycles, the framework, and game logic live elsewhere. A libTooling frontend turns C++ declarations and debug symbols into a versioned intermediate representation; emitters turn that IR into a native-style Interop assembly and a C ABI binding shim, which the shim loader resolves at run time by module offset, vtable slot, or exported symbol.
 
-Three surfaces are generated from the same IR pipeline: the Bedrock MCAPI surface from BDS 1.21.3.01 symbols, and the LeviLamina (LLAPI) and Endstone surfaces from their public headers. Each repository carries its own coverage contract, and CI verifies that contract against the emitted sources on every push.
+Three capability surfaces are generated from the same IR pipeline: the Bedrock capability surface from BDS 1.21.3.01 symbols, and the LeviLamina (LLAPI) and Endstone capability surfaces from their public headers. Each repository carries its own coverage contract, and CI verifies that contract against the emitted sources on every push.
 
 **Frontend**: LLVM 23.1.3 libTooling · IR 1.5.1 · Generator 0.3.0  
 **Platforms**: Windows x64 · Linux x64 · `win-x64-server` and `linux-x64-server` configurations  
@@ -21,11 +21,11 @@ Three surfaces are generated from the same IR pipeline: the Bedrock MCAPI surfac
 
 ## Coverage
 
-Coverage counts come from the committed `coverage/manifest.jsonl` of each surface. "Callable" excludes members that the emitter keeps as reasoned `NotSupportedException` stubs, and `excluded` covers private members.
+Coverage counts come from the committed `coverage/manifest.jsonl` of each capability surface. "Callable" excludes members that the emitter keeps as reasoned `NotSupportedException` stubs, and `excluded` covers private members.
 
-**Rate** is callable over bound members. **Net rate** is callable over all declared members, private ones included; it is the share of the whole API surface that a caller can actually invoke.
+**Rate** is callable over bound members. **Net rate** is callable over all declared members, private ones included; it is the share of the whole capability surface that a caller can actually invoke.
 
-| Surface | Source | Members | Callable | Stubbed | Excluded | Rate | Net rate |
+| Capability surface | Source | Members | Callable | Stubbed | Excluded | Rate | Net rate |
 |---|---|---:|---:|---:|---:|---:|---:|
 | Endstone | Endstone headers | 1,831 | 1,688 | 143 | 268 | 92.2% | **80.4%** |
 | Bedrock (MCAPI) | 1.21.3.01 debug symbols | 65,715 | 56,060 | 9,655 | 3,903 | 85.3% | **80.5%** |
@@ -35,7 +35,7 @@ Bedrock binds 1,403 selected classes out of 6,677 filtered discovered classes �
 
 ### MCAPI symbol coverage
 
-The MCAPI numbers above describe the selected set. Symbol coverage describes how much of the discovered server surface that set reaches.
+The MCAPI numbers above describe the selected set. Symbol coverage describes how much of the discovered server capability surface that set reaches.
 
 Discovery covers 24,632 classes, but about 18,000 of them are standard-library instantiations, Itanium-encoded RTTI names, and anonymous-namespace artifacts. The figures below use the same filter as class selection, so the denominator is the set a class can actually be selected from.
 
@@ -50,16 +50,16 @@ The remaining 38.7% is a long tail: 19,233 symbols spread over 5,274 classes, av
 
 LLAPI stubs are overwhelmingly template handling: rvalue-qualified members (1,612), inaccessible or incomplete template arguments (1,015), template constructors without a visible definition (826), and assignment operators on specializations (814).
 
-## Surfaces
+## Capability surfaces
 
 | Repository | Purpose |
 |---|---|
-| [Bindings.Bedrock](https://github.com/Hosihikari/Bindings.Bedrock) | MCAPI Interop and symbol-dispatched shim for BDS 1.21.3.01 |
-| [Bindings.LeviLamina](https://github.com/Hosihikari/Bindings.LeviLamina) | LLAPI Interop and shim over LeviLamina |
-| [Bindings.Endstone](https://github.com/Hosihikari/Bindings.Endstone) | Endstone C++ API Interop and shim |
-| [Bindings.Generator](https://github.com/Hosihikari/Bindings.Generator) | libTooling frontend, IR emitters, symbol discovery, validation tooling |
-| [Bindings.Ir](https://github.com/Hosihikari/Bindings.Ir) | IR schema, records, JSONL reader/writer, canonical hash, validator |
-| [Bindings.Abi](https://github.com/Hosihikari/Bindings.Abi) | C ABI header, value types, shim loader |
+| [BedrockBinding](https://github.com/Hosihikari/BedrockBinding) | MCAPI Interop and symbol-dispatched binding shim for BDS 1.21.3.01 |
+| [LeviLaminaBinding](https://github.com/Hosihikari/LeviLaminaBinding) | LLAPI Interop and binding shim over LeviLamina |
+| [EndstoneBinding](https://github.com/Hosihikari/EndstoneBinding) | Endstone C++ API Interop and binding shim |
+| [BindingGenerator](https://github.com/Hosihikari/BindingGenerator) | libTooling frontend, IR emitters, symbol discovery, validation tooling |
+| [BindingIr](https://github.com/Hosihikari/BindingIr) | IR schema, records, JSONL reader/writer, canonical hash, validator |
+| [BindingAbi](https://github.com/Hosihikari/BindingAbi) | C ABI header, value types, shim loader |
 
 ## Supported ABI
 
@@ -69,8 +69,8 @@ Maps with named key/value types, callbacks, variants, and custom owning wrappers
 
 ## Provenance
 
-Symbol data is recovered from the proprietary 1.21.3.01 `bedrock_server.pdb`, `bedrock_server.exe`, and `bedrock_server_symbols.debug`; only derived facts and hashes are published. Header supplements come from the public LeviLamina headers. Each surface records the generator version, IR manifest hash, and carrier hashes in `coverage/provenance.json`, and `scripts/verify_generated.py` checks provenance, the coverage baseline, shim counts, and every generated file hash.
+Symbol data is recovered from the proprietary 1.21.3.01 `bedrock_server.pdb`, `bedrock_server.exe`, and `bedrock_server_symbols.debug`; only derived facts and hashes are published. Header supplements come from the public LeviLamina headers. Each capability surface records the generator version, IR manifest hash, and carrier hashes in `coverage/provenance.json`, and `scripts/verify_generated.py` checks provenance, the coverage baseline, shim counts, and every generated file hash.
 
 ## License and trust boundary
 
-LGPL-3.0-or-later for the IR, ABI, and the three bindings surfaces; the generator is GPL-3.0. Bindings run in the server process through the shim, so a wrong ABI match faults the host process rather than throwing a managed exception.
+LGPL-3.0-or-later for the IR, ABI, and the three binding capability surfaces; the generator is GPL-3.0. Bindings run in the server process through the binding shim, so a wrong ABI match faults the server process rather than throwing a managed exception.

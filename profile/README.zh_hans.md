@@ -1,4 +1,4 @@
-# 星光 · 绑定
+# 星光投影（Hosihikari Projection）
 
 <table align="right">
   <tr>
@@ -11,9 +11,9 @@
 
 [English](README.md) | [简体中文](README.zh_hans.md)
 
-为 Minecraft 基岩版 API 生成的 .NET 绑定。libTooling 前端把 C++ 声明与调试符号转成带版本的中间表示；发射器再把 IR 转成贴近原生风格的 Interop 程序集与 C ABI shim，shim 加载器在运行时按模块偏移、vtable 槽或导出符号解析。
+星光投影把 Minecraft 基岩版原生 API 投影成 .NET 绑定。它只负责“原生事实 → C ABI / 托管投影”，不负责插件生命周期、框架本身或游戏逻辑。libTooling 前端把 C++ 声明与调试符号转成带版本的中间表示；发射器再把 IR 转成贴近原生风格的 Interop 程序集与 C ABI binding shim，shim 加载器在运行时按模块偏移、vtable 槽或导出符号解析。
 
-三条表面共用同一条 IR 管线：Bedrock MCAPI 表面来自 BDS 1.21.3.01 的符号，LeviLamina（LLAPI）与 Endstone 表面来自各自公开的头文件。每个仓库都带自己的覆盖率契约，CI 在每次推送时对照发射产物校验该契约。
+三条能力面共用同一条 IR 管线：Bedrock 能力面来自 BDS 1.21.3.01 的符号，LeviLamina（LLAPI）与 Endstone 能力面来自各自公开的头文件。每个仓库都带自己的覆盖率契约，CI 在每次推送时对照发射产物校验该契约。
 
 **前端**：LLVM 23.1.3 libTooling · IR 1.5.1 · 生成器 0.3.0  
 **平台**：Windows x64 · Linux x64 · `win-x64-server` 与 `linux-x64-server` 配置  
@@ -21,11 +21,11 @@
 
 ## 覆盖
 
-覆盖数字取自各表面提交的 `coverage/manifest.jsonl`。「可调用」不含发射器保留为带原因 `NotSupportedException` stub 的成员，`excluded` 为私有成员。
+覆盖数字取自各能力面提交的 `coverage/manifest.jsonl`。「可调用」不含发射器保留为带原因 `NotSupportedException` stub 的成员，`excluded` 为私有成员。
 
-「比例」是「可调用」占已绑定成员的比例。「净比例」是「可调用」占全部声明成员（含私有）的比例，即调用方真正能调到的 API 份额。
+「比例」是「可调用」占已绑定成员的比例。「净比例」是「可调用」占全部声明成员（含私有）的比例，即调用方真正能调到的能力面份额。
 
-| 表面 | 来源 | 成员 | 可调用 | stub | excluded | 比例 | 净比例 |
+| 能力面 | 来源 | 成员 | 可调用 | stub | excluded | 比例 | 净比例 |
 |---|---|---:|---:|---:|---:|---:|---:|
 | Endstone | Endstone 头文件 | 1,831 | 1,688 | 143 | 268 | 92.2% | **80.4%** |
 | Bedrock（MCAPI） | 1.21.3.01 调试符号 | 65,715 | 56,060 | 9,655 | 3,903 | 85.3% | **80.5%** |
@@ -35,7 +35,7 @@ Bedrock 从过滤后的 6,677 个可发现类中选出 1,403 个，覆盖过滤�
 
 ### MCAPI 符号覆盖
 
-上面的 MCAPI 数字描述的是已选类集。符号覆盖描述的是该类集对已发现服务端表面的到达程度。
+上面的 MCAPI 数字描述的是已选类集。符号覆盖描述的是该类集对已发现服务端能力面的到达程度。
 
 发现结果共 24,632 个类，其中约 1.8 万个是标准库实例化、Itanium 编码的 RTTI 名与匿名命名空间产物。下表与选类使用同一套过滤，分母是真正可供选类的集合。
 
@@ -50,16 +50,16 @@ Bedrock 从过滤后的 6,677 个可发现类中选出 1,403 个，覆盖过滤�
 
 LLAPI 的 stub 高度集中在模板处理：rvalue 限定成员（1,612）、不可访问或不完整的模板参数（1,015）、无可见定义的模板构造（826）、模板特化的赋值运算符（814）。
 
-## 表面
+## 能力面
 
 | 仓 | 作用 |
 |---|---|
-| [Bindings.Bedrock](https://github.com/Hosihikari/Bindings.Bedrock) | BDS 1.21.3.01 的 MCAPI Interop 与按符号分发的 shim |
-| [Bindings.LeviLamina](https://github.com/Hosihikari/Bindings.LeviLamina) | 基于 LeviLamina 的 LLAPI Interop 与 shim |
-| [Bindings.Endstone](https://github.com/Hosihikari/Bindings.Endstone) | Endstone C++ API 的 Interop 与 shim |
-| [Bindings.Generator](https://github.com/Hosihikari/Bindings.Generator) | libTooling 前端、IR 发射器、符号发现与校验工具 |
-| [Bindings.Ir](https://github.com/Hosihikari/Bindings.Ir) | IR schema、记录模型、JSONL 读写、规范哈希与校验器 |
-| [Bindings.Abi](https://github.com/Hosihikari/Bindings.Abi) | C ABI 头、值类型与 shim 加载器 |
+| [BedrockBinding](https://github.com/Hosihikari/BedrockBinding) | BDS 1.21.3.01 的 MCAPI Interop 与按符号分发的 binding shim |
+| [LeviLaminaBinding](https://github.com/Hosihikari/LeviLaminaBinding) | 基于 LeviLamina 的 LLAPI Interop 与 binding shim |
+| [EndstoneBinding](https://github.com/Hosihikari/EndstoneBinding) | Endstone C++ API 的 Interop 与 binding shim |
+| [BindingGenerator](https://github.com/Hosihikari/BindingGenerator) | libTooling 前端、IR 发射器、符号发现与校验工具 |
+| [BindingIr](https://github.com/Hosihikari/BindingIr) | IR schema、记录模型、JSONL 读写、规范哈希与校验器 |
+| [BindingAbi](https://github.com/Hosihikari/BindingAbi) | C ABI 头、值类型与 shim 加载器 |
 
 ## 支持的 ABI
 
@@ -69,8 +69,8 @@ map（需具名 key/value 类型）、回调、variant 与自定义拥有型包�
 
 ## 数据来源
 
-符号数据取自专有的 1.21.3.01 `bedrock_server.pdb`、`bedrock_server.exe` 与 `bedrock_server_symbols.debug`，只发布派生事实与哈希。头文件补充来自公开的 LeviLamina 头。各表面把生成器版本、IR manifest 哈希与载体哈希记录在 `coverage/provenance.json`，`scripts/verify_generated.py` 校验来源、覆盖基线、shim 数量与每个生成文件的哈希。
+符号数据取自专有的 1.21.3.01 `bedrock_server.pdb`、`bedrock_server.exe` 与 `bedrock_server_symbols.debug`，只发布派生事实与哈希。头文件补充来自公开的 LeviLamina 头。各能力面把生成器版本、IR manifest 哈希与载体哈希记录在 `coverage/provenance.json`，`scripts/verify_generated.py` 校验来源、覆盖基线、shim 数量与每个生成文件的哈希。
 
 ## 许可与信任边界
 
-IR、ABI 与三条绑定表面为 LGPL-3.0-or-later；生成器为 GPL-3.0。绑定经 shim 在服务器进程内运行，ABI 匹配错误会让宿主进程崩溃，而不是抛出托管异常。
+IR、ABI 与三条绑定能力面为 LGPL-3.0-or-later；生成器为 GPL-3.0。绑定经 binding shim 在服务器进程内运行，ABI 匹配错误会让服务器进程崩溃，而不是抛出托管异常。
