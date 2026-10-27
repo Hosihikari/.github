@@ -13,29 +13,29 @@
 
 星光投影把 Minecraft 基岩版原生 API 投影成 .NET 绑定。它只负责“原生事实 → C ABI / 托管投影”，不负责插件生命周期、框架本身或游戏逻辑。libTooling 前端把 C++ 声明与调试符号转成带版本的中间表示；发射器再把 IR 转成贴近原生风格的 Interop 程序集与 C ABI binding shim，shim 加载器在运行时按模块偏移、vtable 槽或导出符号解析。
 
-三条能力面共用同一条 IR 管线：Bedrock 能力面来自 BDS 1.21.3.01 的符号，LeviLamina（LLAPI）与 Endstone 能力面来自各自公开的头文件。每个仓库都带自己的覆盖率契约，CI 在每次推送时对照发射产物校验该契约。
+三条互操作面共用同一条 IR 管线：Bedrock 互操作面来自 BDS 1.21.3.01 的符号，LeviLamina（LLAPI）与 Endstone 互操作面来自各自公开的头文件。每个仓库都带自己的覆盖率契约，CI 在每次推送时对照发射产物校验该契约。
 
 **前端**：LLVM 23.1.3 libTooling · IR 1.5.1 · 生成器 0.3.0  
 **平台**：Windows x64 · Linux x64 · `win-x64-server` 与 `linux-x64-server` 配置  
-**载体**：BDS 1.21.3.01（直连 MCAPI）· LeviLamina v0.13.5（LLAPI）· Endstone 0.11
+**载体**：BDS 1.21.3.01（直连 MCAPI）· LeviLamina 26.51（LLAPI）· Endstone 0.11
 
 ## 覆盖
 
-覆盖数字取自各能力面提交的 `coverage/manifest.jsonl`。「可调用」不含发射器保留为带原因 `NotSupportedException` stub 的成员，`excluded` 为私有成员。
+覆盖数字取自各互操作面提交的 `coverage/manifest.jsonl`。「可调用」不含发射器保留为带原因 `NotSupportedException` stub 的成员，`excluded` 为私有成员。
 
-「比例」是「可调用」占已绑定成员的比例。「净比例」是「可调用」占全部声明成员（含私有）的比例，即调用方真正能调到的能力面份额。
+「比例」是「可调用」占已绑定成员的比例。「净比例」是「可调用」占全部声明成员（含私有）的比例，即调用方真正能调到的互操作面份额。
 
-| 能力面 | 来源 | 成员 | 可调用 | stub | excluded | 比例 | 净比例 |
+| 互操作面 | 来源 | 成员 | 可调用 | stub | excluded | 比例 | 净比例 |
 |---|---|---:|---:|---:|---:|---:|---:|
 | Endstone | Endstone 头文件 | 1,831 | 1,688 | 143 | 268 | 92.2% | **80.4%** |
-| Bedrock（MCAPI） | 1.21.3.01 调试符号 | 113,084 | 86,608 | 26,476 | 5,141 | 76.6% | **73.3%** |
+| Bedrock（MCAPI） | 1.21.3.01 调试符号；v0.13.5 头文件补充 | 113,084 | 86,608 | 26,476 | 5,141 | 76.6% | **73.3%** |
 | LeviLamina（LLAPI） | LeviLamina 头文件 | 5,902 | 3,053 | 2,849 | 243 | 51.7% | **49.7%** |
 
 Bedrock 选出 3,885 个类；把这些类按值引用的记录一并闭包后，覆盖面到达 5,952 个「既有符号又有头文件声明」的类型中的 4,245 个，覆盖 57,731 个符号中的 53,092 个。其余 MCAPI stub 主要是无符号或无 vtable 槽的成员（12,727）与无符号的构造函数（7,259）。
 
 ### MCAPI 符号覆盖
 
-上面的 MCAPI 数字描述的是已选类集。符号覆盖描述的是该类集对已发现服务端能力面的到达程度。
+上面的 MCAPI 数字描述的是已选类集。符号覆盖描述的是该类集对已发现服务端互操作面的到达程度。
 
 发现结果共 23,410 个类，其中约 1.8 万个是标准库实例化、Itanium 编码的 RTTI 名与匿名命名空间产物。下表只把「同时有符号与头文件声明」的类型算作可绑定，分母是真正可供选类的集合。
 
@@ -50,7 +50,7 @@ Bedrock 选出 3,885 个类；把这些类按值引用的记录一并闭包后�
 
 LLAPI 的 stub 高度集中在模板处理：rvalue 限定成员（1,612）、不可访问或不完整的模板参数（1,015）、无可见定义的模板构造（826）、模板特化的赋值运算符（814）。
 
-## 能力面
+## 互操作面
 
 | 仓 | 作用 |
 |---|---|
@@ -69,8 +69,8 @@ map（需具名 key/value 类型）、回调、variant 与自定义拥有型包�
 
 ## 数据来源
 
-符号数据取自专有的 1.21.3.01 `bedrock_server.pdb`、`bedrock_server.exe` 与 `bedrock_server_symbols.debug`，只发布派生事实与哈希。头文件补充来自公开的 LeviLamina 头。各能力面把生成器版本、IR manifest 哈希与载体哈希记录在 `coverage/provenance.json`，`scripts/verify_generated.py` 校验来源、覆盖基线、shim 数量与每个生成文件的哈希。
+符号数据取自专有的 1.21.3.01 `bedrock_server.pdb`、`bedrock_server.exe` 与 `bedrock_server_symbols.debug`，只发布派生事实与哈希。Bedrock 的头文件补充来自公开的 LeviLamina v0.13.5 头；LLAPI 互操作面解析的是 LeviLamina 26.51 的头。各互操作面把生成器版本、IR manifest 哈希与载体哈希记录在 `coverage/provenance.json`，`scripts/verify_generated.py` 校验来源、覆盖基线、shim 数量与每个生成文件的哈希。
 
 ## 许可与信任边界
 
-IR、ABI 与三条绑定能力面为 LGPL-3.0-or-later；生成器为 GPL-3.0。绑定经 binding shim 在服务器进程内运行，ABI 匹配错误会让服务器进程崩溃，而不是抛出托管异常。
+IR、ABI 与三条绑定互操作面为 LGPL-3.0-or-later；生成器为 GPL-3.0。绑定经 binding shim 在服务器进程内运行，ABI 匹配错误会让服务器进程崩溃，而不是抛出托管异常。
