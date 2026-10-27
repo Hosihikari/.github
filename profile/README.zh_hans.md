@@ -28,7 +28,7 @@
 | 互操作面 | 来源 | 成员 | 可调用 | stub | excluded | 比例 | 净比例 |
 |---|---|---:|---:|---:|---:|---:|---:|
 | Endstone | Endstone 头文件 | 1,831 | 1,688 | 143 | 268 | 92.2% | **80.4%** |
-| Bedrock（MCAPI） | 1.21.3.01 调试符号；v0.13.5 头文件补充 | 113,084 | 86,608 | 26,476 | 5,141 | 76.6% | **73.3%** |
+| Bedrock（MCAPI） | 1.21.3.01 调试符号与 BDS 头文件 | 113,084 | 86,608 | 26,476 | 5,141 | 76.6% | **73.3%** |
 | LeviLamina（LLAPI） | LeviLamina 头文件 | 5,902 | 3,053 | 2,849 | 243 | 51.7% | **49.7%** |
 
 Bedrock 选出 3,885 个类；把这些类按值引用的记录一并闭包后，覆盖面到达 5,952 个「既有符号又有头文件声明」的类型中的 4,245 个，覆盖 57,731 个符号中的 53,092 个。其余 MCAPI stub 主要是无符号或无 vtable 槽的成员（12,727）与无符号的构造函数（7,259）。
@@ -69,7 +69,7 @@ map（需具名 key/value 类型）、回调、variant 与自定义拥有型包�
 
 ## 数据来源
 
-符号数据取自专有的 1.21.3.01 `bedrock_server.pdb`、`bedrock_server.exe` 与 `bedrock_server_symbols.debug`，只发布派生事实与哈希。Bedrock 的头文件补充来自公开的 LeviLamina v0.13.5 头；LLAPI 互操作面解析的是 LeviLamina 26.51 的头。各互操作面把生成器版本、IR manifest 哈希与载体哈希记录在 `coverage/provenance.json`，`scripts/verify_generated.py` 校验来源、覆盖基线、shim 数量与每个生成文件的哈希。
+符号数据取自专有的 1.21.3.01 `bedrock_server.pdb`、`bedrock_server.exe` 与 `bedrock_server_symbols.debug`，只发布派生事实与哈希。Bedrock 的头文件补充是 LeviLamina 转载的 BDS 头，只用来提供声明与布局，不为它发射任何东西。LLAPI 互操作面解析的是 LeviLamina 26.51 的头。各互操作面把生成器版本、IR manifest 哈希与载体哈希记录在 `coverage/provenance.json`，`scripts/verify_generated.py` 校验来源、覆盖基线、shim 数量与每个生成文件的哈希。
 
 ## 许可与信任边界
 

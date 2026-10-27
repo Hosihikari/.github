@@ -28,7 +28,7 @@ Coverage counts come from the committed `coverage/manifest.jsonl` of each intero
 | Interop surface | Source | Members | Callable | Stubbed | Excluded | Rate | Net rate |
 |---|---|---:|---:|---:|---:|---:|---:|
 | Endstone | Endstone headers | 1,831 | 1,688 | 143 | 268 | 92.2% | **80.4%** |
-| Bedrock (MCAPI) | 1.21.3.01 debug symbols; v0.13.5 header supplement | 113,084 | 86,608 | 26,476 | 5,141 | 76.6% | **73.3%** |
+| Bedrock (MCAPI) | 1.21.3.01 debug symbols and BDS headers | 113,084 | 86,608 | 26,476 | 5,141 | 76.6% | **73.3%** |
 | LeviLamina (LLAPI) | LeviLamina headers | 5,902 | 3,053 | 2,849 | 243 | 51.7% | **49.7%** |
 
 Bedrock binds 3,885 selected classes; closing over the records those classes reference by value, the surface reaches 4,245 of the 5,952 types that have both a symbol and a header declaration — 53,092 of 57,731 symbols. Remaining MCAPI stubs are dominated by members with no symbol or vtable slot (12,727) and constructors with no symbol (7,259).
@@ -69,7 +69,7 @@ Maps with named key/value types, callbacks, variants, and custom owning wrappers
 
 ## Provenance
 
-Symbol data is recovered from the proprietary 1.21.3.01 `bedrock_server.pdb`, `bedrock_server.exe`, and `bedrock_server_symbols.debug`; only derived facts and hashes are published. The Bedrock header supplement comes from the public LeviLamina v0.13.5 headers; the LLAPI surface is parsed from LeviLamina 26.51 headers. Each interop surface records the generator version, IR manifest hash, and carrier hashes in `coverage/provenance.json`, and `scripts/verify_generated.py` checks provenance, the coverage baseline, shim counts, and every generated file hash.
+Symbol data is recovered from the proprietary 1.21.3.01 `bedrock_server.pdb`, `bedrock_server.exe`, and `bedrock_server_symbols.debug`; only derived facts and hashes are published. The Bedrock header supplement is the BDS header text that LeviLamina republishes; it only supplies declarations and layouts, and nothing is emitted on its behalf. The LLAPI surface is parsed from LeviLamina 26.51 headers. Each interop surface records the generator version, IR manifest hash, and carrier hashes in `coverage/provenance.json`, and `scripts/verify_generated.py` checks provenance, the coverage baseline, shim counts, and every generated file hash.
 
 ## License and trust boundary
 
