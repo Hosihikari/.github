@@ -17,7 +17,7 @@ Three capability surfaces are generated from the same IR pipeline: the Bedrock c
 
 **Frontend**: LLVM 23.1.3 libTooling · IR 1.5.1 · Generator 0.3.0  
 **Platforms**: Windows x64 · Linux x64 · `win-x64-server` and `linux-x64-server` configurations  
-**Carriers**: BDS 1.21.3.01 (direct MCAPI) · LeviLamina v0.13.5 (LLAPI, 26.51) · Endstone 0.11
+**Carriers**: BDS 1.21.3.01 (direct MCAPI) · LeviLamina v0.13.5 (LLAPI) · Endstone 0.11
 
 ## Coverage
 
@@ -28,25 +28,25 @@ Coverage counts come from the committed `coverage/manifest.jsonl` of each capabi
 | Capability surface | Source | Members | Callable | Stubbed | Excluded | Rate | Net rate |
 |---|---|---:|---:|---:|---:|---:|---:|
 | Endstone | Endstone headers | 1,831 | 1,688 | 143 | 268 | 92.2% | **80.4%** |
-| Bedrock (MCAPI) | 1.21.3.01 debug symbols | 65,715 | 56,060 | 9,655 | 3,903 | 85.3% | **80.5%** |
+| Bedrock (MCAPI) | 1.21.3.01 debug symbols | 113,084 | 86,608 | 26,476 | 5,141 | 76.6% | **73.3%** |
 | LeviLamina (LLAPI) | LeviLamina headers | 5,902 | 3,053 | 2,849 | 243 | 51.7% | **49.7%** |
 
-Bedrock binds 1,403 selected classes out of 6,677 filtered discovered classes — 30,402 of 49,635 filtered public symbols. Remaining MCAPI stubs are dominated by methods with no symbol or vtable slot (4,456) and constructors with no symbol (2,495).
+Bedrock binds 3,885 selected classes; closing over the records those classes reference by value, the surface reaches 4,245 of the 5,952 types that have both a symbol and a header declaration — 53,092 of 57,731 symbols. Remaining MCAPI stubs are dominated by members with no symbol or vtable slot (12,727) and constructors with no symbol (7,259).
 
 ### MCAPI symbol coverage
 
 The MCAPI numbers above describe the selected set. Symbol coverage describes how much of the discovered server capability surface that set reaches.
 
-Discovery covers 24,632 classes, but about 18,000 of them are standard-library instantiations, Itanium-encoded RTTI names, and anonymous-namespace artifacts. The figures below use the same filter as class selection, so the denominator is the set a class can actually be selected from.
+Discovery covers 23,410 classes, but about 18,000 of them are standard-library instantiations, Itanium-encoded RTTI names, and anonymous-namespace artifacts. The figures below count a type as bindable only when it has both a symbol and a header declaration, so the denominator is the set a class can actually be selected from.
 
 | Measure | Covered | Discovered | Coverage |
 |---|---:|---:|---:|
-| Classes | 1,403 | 6,677 | 21.0% |
-| Public symbols | 30,402 | 49,635 | **61.3%** |
+| Classes | 4,245 | 5,952 | 71.3% |
+| Public symbols | 53,092 | 57,731 | **92.0%** |
 
 `BindingGenerator/artifacts/symbol-classes-1.21.3.tsv` is the discovery list; `scripts/classes-1.21.3.txt` in the Bedrock repository is the selected subset. Coverage moves only when a class is added.
 
-The remaining 38.7% is a long tail: 19,233 symbols spread over 5,274 classes, averaging 3.6 symbols each.
+The remaining 7.4% is a long tail: 4,639 symbols spread over 1,707 classes, averaging 2.7 symbols each.
 
 LLAPI stubs are overwhelmingly template handling: rvalue-qualified members (1,612), inaccessible or incomplete template arguments (1,015), template constructors without a visible definition (826), and assignment operators on specializations (814).
 
