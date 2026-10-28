@@ -54,12 +54,12 @@ LLAPI 的 stub 高度集中在模板处理：rvalue 限定成员（1,612）、�
 
 | 仓 | 作用 |
 |---|---|
-| [BedrockBinding](https://github.com/Hosihikari/BedrockBinding) | BDS 1.21.3.01 的 MCAPI Interop 与按符号分发的 binding shim |
-| [LeviLaminaBinding](https://github.com/Hosihikari/LeviLaminaBinding) | 基于 LeviLamina 的 LLAPI Interop 与 binding shim |
-| [EndstoneBinding](https://github.com/Hosihikari/EndstoneBinding) | Endstone C++ API 的 Interop 与 binding shim |
-| [BindingGenerator](https://github.com/Hosihikari/BindingGenerator) | libTooling 前端、IR 发射器、符号发现与校验工具 |
-| [BindingIr](https://github.com/Hosihikari/BindingIr) | IR schema、记录模型、JSONL 读写、规范哈希与校验器 |
-| [BindingAbi](https://github.com/Hosihikari/BindingAbi) | C ABI 头、值类型与 shim 加载器 |
+| [BedrockBinding](https://github.com/HosihikariProjection/BedrockBinding) | BDS 1.21.3.01 的 MCAPI Interop 与按符号分发的 binding shim |
+| [LeviLaminaBinding](https://github.com/HosihikariProjection/LeviLaminaBinding) | 基于 LeviLamina 的 LLAPI Interop 与 binding shim |
+| [EndstoneBinding](https://github.com/HosihikariProjection/EndstoneBinding) | Endstone C++ API 的 Interop 与 binding shim |
+| [BindingGenerator](https://github.com/HosihikariProjection/BindingGenerator) | libTooling 前端、IR 发射器、符号发现与校验工具 |
+| [BindingIr](https://github.com/HosihikariProjection/BindingIr) | IR schema、记录模型、JSONL 读写、规范哈希与校验器 |
+| [BindingAbi](https://github.com/HosihikariProjection/BindingAbi) | C ABI 头、值类型与 shim 加载器 |
 
 ## 支持的 ABI
 

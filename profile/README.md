@@ -54,12 +54,12 @@ LLAPI stubs are overwhelmingly template handling: rvalue-qualified members (1,61
 
 | Repository | Purpose |
 |---|---|
-| [BedrockBinding](https://github.com/Hosihikari/BedrockBinding) | MCAPI Interop and symbol-dispatched binding shim for BDS 1.21.3.01 |
-| [LeviLaminaBinding](https://github.com/Hosihikari/LeviLaminaBinding) | LLAPI Interop and binding shim over LeviLamina |
-| [EndstoneBinding](https://github.com/Hosihikari/EndstoneBinding) | Endstone C++ API Interop and binding shim |
-| [BindingGenerator](https://github.com/Hosihikari/BindingGenerator) | libTooling frontend, IR emitters, symbol discovery, validation tooling |
-| [BindingIr](https://github.com/Hosihikari/BindingIr) | IR schema, records, JSONL reader/writer, canonical hash, validator |
-| [BindingAbi](https://github.com/Hosihikari/BindingAbi) | C ABI header, value types, shim loader |
+| [BedrockBinding](https://github.com/HosihikariProjection/BedrockBinding) | MCAPI Interop and symbol-dispatched binding shim for BDS 1.21.3.01 |
+| [LeviLaminaBinding](https://github.com/HosihikariProjection/LeviLaminaBinding) | LLAPI Interop and binding shim over LeviLamina |
+| [EndstoneBinding](https://github.com/HosihikariProjection/EndstoneBinding) | Endstone C++ API Interop and binding shim |
+| [BindingGenerator](https://github.com/HosihikariProjection/BindingGenerator) | libTooling frontend, IR emitters, symbol discovery, validation tooling |
+| [BindingIr](https://github.com/HosihikariProjection/BindingIr) | IR schema, records, JSONL reader/writer, canonical hash, validator |
+| [BindingAbi](https://github.com/HosihikariProjection/BindingAbi) | C ABI header, value types, shim loader |
 
 ## Supported ABI
 
