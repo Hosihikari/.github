@@ -37,7 +37,7 @@ Bedrock projects 6,433 type declarations (6,221 classes, 211 structs, 1 union) a
 
 The MCAPI numbers above describe the selected set. Symbol coverage describes how much of the discovered server interop surface that set reaches.
 
-Discovery records 23,410 RTTI spellings, but most are standard-library instantiations, Itanium-encoded RTTI names, and anonymous-namespace artifacts: 1,599 fall in library namespaces and 12,829 do not resolve to a header declaration. The remaining 8,981 spellings collapse into the 5,952 types that have both a symbol and a header declaration.
+Discovery records 23,409 RTTI spellings, but most are standard-library instantiations, Itanium-encoded RTTI names, and anonymous-namespace artifacts: 1,599 fall in library namespaces and 12,829 do not resolve to a header declaration. The remaining 8,981 spellings collapse into the 5,952 types that have both a symbol and a header declaration.
 
 | Measure | Covered | Discovered | Coverage |
 |---|---:|---:|---:|
