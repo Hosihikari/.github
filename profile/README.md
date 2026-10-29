@@ -15,40 +15,38 @@ Hosihikari Projection (星光投影) projects the Minecraft Bedrock native APIs 
 
 Three interop surfaces are generated from the same IR pipeline: the Bedrock interop surface from BDS 1.21.3.01 symbols, and the LeviLamina (LLAPI) and Endstone interop surfaces from their public headers. Each repository carries its own coverage contract, and CI verifies that contract against the emitted sources on every push.
 
-**Frontend**: LLVM 23.1.3 libTooling · IR 1.5.1 · Generator 0.3.0  
+**Frontend**: LLVM 23.1.4 libTooling · IR 1.6.0 · Generator 0.3.0  
 **Platforms**: Windows x64 · Linux x64 · `win-x64-server` and `linux-x64-server` configurations  
 **Carriers**: BDS 1.21.3.01 (direct MCAPI) · LeviLamina 26.51 (LLAPI) · Endstone 0.11
 
 ## Coverage
 
-Coverage counts come from the committed `coverage/manifest.jsonl` of each interop surface. "Callable" excludes members that the emitter keeps as reasoned `NotSupportedException` stubs, and `excluded` covers private members.
+Coverage counts come from the committed `coverage/manifest.jsonl` of each interop surface. "Members" and "Excluded" count distinct member ids in the manifest, including enumerator constants; "Stubbed" counts members the emitter keeps as reasoned `NotSupportedException` stubs, and "Callable" is Members minus Stubbed. Excluded covers private members.
 
 **Rate** is callable over bound members. **Net rate** is callable over all declared members, private ones included; it is the share of the whole interop surface that a caller can actually invoke.
 
 | Interop surface | Source | Members | Callable | Stubbed | Excluded | Rate | Net rate |
 |---|---|---:|---:|---:|---:|---:|---:|
-| Endstone | Endstone headers | 1,831 | 1,688 | 143 | 268 | 92.2% | **80.4%** |
-| Bedrock (MCAPI) | 1.21.3.01 debug symbols and BDS headers | 113,084 | 86,608 | 26,476 | 5,141 | 76.6% | **73.3%** |
-| LeviLamina (LLAPI) | LeviLamina headers | 5,902 | 3,053 | 2,849 | 243 | 51.7% | **49.7%** |
+| Endstone | Endstone headers | 1,968 | 1,825 | 143 | 268 | 92.7% | **81.6%** |
+| Bedrock (MCAPI) | 1.21.3.01 debug symbols and BDS headers | 74,012 | 38,888 | 35,124 | 2,741 | 52.5% | **50.7%** |
+| LeviLamina (LLAPI) | LeviLamina headers | 6,278 | 4,440 | 1,838 | 237 | 70.7% | **68.2%** |
 
-Bedrock binds 3,885 selected classes; closing over the records those classes reference by value, the surface reaches 4,245 of the 5,952 types that have both a symbol and a header declaration — 53,092 of 57,731 symbols. Remaining MCAPI stubs are dominated by members with no symbol or vtable slot (12,727) and constructors with no symbol (7,259).
+Bedrock projects 6,433 type declarations (6,221 classes, 211 structs, 1 union) and 704 enums; every one of the 5,952 discovered types that has both a symbol and a header declaration is selected, so symbol coverage for that set is complete — 57,731 of 57,731 symbols. Remaining MCAPI stubs are dominated by members with no symbol or vtable slot (15,602), constructors with no symbol (10,828), and classes with no accessible destructor (2,419).
 
 ### MCAPI symbol coverage
 
 The MCAPI numbers above describe the selected set. Symbol coverage describes how much of the discovered server interop surface that set reaches.
 
-Discovery covers 23,410 classes, but about 18,000 of them are standard-library instantiations, Itanium-encoded RTTI names, and anonymous-namespace artifacts. The figures below count a type as bindable only when it has both a symbol and a header declaration, so the denominator is the set a class can actually be selected from.
+Discovery records 23,410 RTTI spellings, but most are standard-library instantiations, Itanium-encoded RTTI names, and anonymous-namespace artifacts: 1,599 fall in library namespaces and 12,829 do not resolve to a header declaration. The remaining 8,981 spellings collapse into the 5,952 types that have both a symbol and a header declaration.
 
 | Measure | Covered | Discovered | Coverage |
 |---|---:|---:|---:|
-| Classes | 4,245 | 5,952 | 71.3% |
-| Public symbols | 53,092 | 57,731 | **92.0%** |
+| Classes | 5,952 | 5,952 | 100% |
+| Public symbols | 57,731 | 57,731 | **100%** |
 
 `BindingGenerator/artifacts/symbol-classes-1.21.3.tsv` is the discovery list; `scripts/classes-1.21.3.txt` in the Bedrock repository is the selected subset. Coverage moves only when a class is added.
 
-The remaining 7.4% is a long tail: 4,639 symbols spread over 1,707 classes, averaging 2.7 symbols each.
-
-LLAPI stubs are overwhelmingly template handling: rvalue-qualified members (1,612), inaccessible or incomplete template arguments (1,015), template constructors without a visible definition (826), and assignment operators on specializations (814).
+LLAPI stubs are concentrated in template handling and ownership: inaccessible or incomplete template arguments (584), template constructors without a visible definition (442), assignment operators on specializations (424), and classes with no accessible destructor (189).
 
 ## Interop surfaces
 
@@ -64,6 +62,8 @@ LLAPI stubs are overwhelmingly template handling: rvalue-qualified members (1,61
 ## Supported ABI
 
 Scalars and enum underlying types; `std::string` and `std::string_view` values and const references; single-level `T*` and `T&` as `void*`; by-value records through registers or the hidden return buffer; `optional_ref<T>`, `std::vector<T>`, `std::optional<T>`, `std::shared_ptr<T>` and `std::weak_ptr<T>`; fields whose type is not projected surface their storage address as a readonly `nint`.
+
+Enum declarations project as C# enums carrying their evaluated enumerators. Namespace-level functions — including carrier-exported out-of-line functions, which link through the carrier import library — become `Functions` static classes, and namespace-level comparison operators become static `operator_equal`-style methods. A type with no usable member keeps its type identity and carries `[Obsolete]`.
 
 Maps with named key/value types, callbacks, variants, and custom owning wrappers remain stubs. Records without a resolvable copy constructor or destructor stay stubbed.
 
