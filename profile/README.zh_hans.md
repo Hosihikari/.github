@@ -13,7 +13,7 @@
 
 星光投影把 Minecraft 基岩版原生 API 投影成 .NET 绑定。它只负责“原生事实 → C ABI / 托管投影”，不负责插件生命周期、框架本身或游戏逻辑。libTooling 前端把 C++ 声明与调试符号转成带版本的中间表示；发射器再把 IR 转成贴近原生风格的 Interop 程序集与 C ABI binding shim，shim 加载器在运行时按模块偏移、vtable 槽或导出符号解析。
 
-三条互操作面共用同一条 IR 管线：Bedrock 互操作面来自 BDS 1.21.3.01 的符号，LeviLamina（LLAPI）与 Endstone 互操作面来自各自公开的头文件。每个仓库都带自己的覆盖率契约，CI 在每次推送时对照发射产物校验该契约。
+三条互操作面共用同一条 IR 管线：Bedrock 互操作面在默认分支来自 BDS 1.21.3.01 的符号，在 `v1.26.51` 分支来自 BDS 1.26.51.1 的头文件树；LeviLamina（LLAPI）与 Endstone 互操作面来自各自公开的头文件。每个仓库都带自己的覆盖率契约，CI 在每次推送时对照发射产物校验该契约。
 
 **前端**：LLVM 23.1.4 libTooling · IR 1.6.0 · 生成器 0.3.0  
 **平台**：Windows x64 · Linux x64 · `win-x64-server` 与 `linux-x64-server` 配置  
@@ -29,11 +29,14 @@
 |---|---|---:|---:|---:|---:|---:|---:|
 | Endstone | Endstone 头文件 | 1,968 | 1,825 | 143 | 268 | 92.7% | **81.6%** |
 | Bedrock（MCAPI） | 1.21.3.01 调试符号与 BDS 头文件 | 76,578 | 42,289 | 34,289 | 4,051 | 55.2% | **52.4%** |
+| Bedrock（MCAPI，1.26.51.1） | 1.26.51.1 头文件 IR 与 LeviLamina 头文件 | 100,896 | 83,813 | 17,083 | 581 | 83.1% | **82.6%** |
 | LeviLamina（LLAPI） | LeviLamina 头文件 | 6,278 | 4,443 | 1,835 | 237 | 70.8% | **68.2%** |
 
 Bedrock 投影 6,433 个类型声明（6,221 个类、211 个 struct、1 个 union）与 704 个枚举；5,952 个「既有符号又有头文件声明」的类型全部入选，符号覆盖对这批类型是完整的——57,731 / 57,731。其余 MCAPI stub 主要是无符号或无 vtable 槽的成员（15,602）、无符号的构造函数（10,828）与没有可访问析构的类（2,270）。
 
-### MCAPI 符号覆盖
+1.26.51.1 面由 LeviLamina `ee049f1dc` 的 5,192 个头文件发射：12,043 个声明投影为 9,110 个互操作类型与 135,927 个垫片函数。成员在运行期经 `pl_resolve_symbol` 按名解析：65,760 个修饰名中 41,099 个在 1.26.51.1 服务器中可解析（62.5%）；52,561 个按名垫片函数中 38,516 个可解析（73.3%）。
+
+### MCAPI 符号覆盖（1.21.3.01）
 
 上面的 MCAPI 数字描述的是已选类集。符号覆盖描述的是该类集对已发现服务端互操作面的到达程度。
 
@@ -52,7 +55,7 @@ LLAPI 的 stub 集中在模板与所有权处理：不可访问或不完整的�
 
 | 仓 | 作用 |
 |---|---|
-| [BedrockBinding](https://github.com/HosihikariProjection/BedrockBinding) | BDS 1.21.3.01 的 MCAPI Interop 与按符号分发的 binding shim |
+| [BedrockBinding](https://github.com/HosihikariProjection/BedrockBinding) | BDS 1.21.3.01（`v1.21.3`）与 BDS 1.26.51.1（`v1.26.51`，按名解析）的 MCAPI Interop 与 binding shim |
 | [LeviLaminaBinding](https://github.com/HosihikariProjection/LeviLaminaBinding) | 基于 LeviLamina 的 LLAPI Interop 与 binding shim |
 | [EndstoneBinding](https://github.com/HosihikariProjection/EndstoneBinding) | Endstone C++ API 的 Interop 与 binding shim |
 | [BindingGenerator](https://github.com/HosihikariProjection/BindingGenerator) | libTooling 前端、IR 发射器、符号发现与校验工具 |
@@ -61,11 +64,11 @@ LLAPI 的 stub 集中在模板与所有权处理：不可访问或不完整的�
 
 ## 支持的 ABI
 
-标量与枚举底层类型；`std::string` 与 `std::string_view` 的值与 const 引用；单层 `T*` 与 `T&` 以 `void*` 传递；按值 record 走寄存器或隐藏返回缓冲区；`optional_ref<T>`、`std::vector<T>`、`std::optional<T>`、`std::shared_ptr<T>` 与 `std::weak_ptr<T>`；类型未投影的字段以只读 `nint` 暴露存储地址。
+标量与枚举底层类型；`std::string` 与 `std::string_view` 的值与 const 引用；单层 `T*` 与 `T&` 以 `void*` 传递；按值 record 走寄存器、隐藏返回缓冲区或按名解析的拷贝构造函数；`optional_ref<T>`、`std::vector<T>`、`std::optional<T>`、`std::shared_ptr<T>` 与 `std::weak_ptr<T>`；类型未投影的字段以只读 `nint` 暴露存储地址。
 
 枚举声明投影为携带求值结果的 C# 枚举。命名空间级函数——包括经载体导入库调用的 out-of-line 函数——投影为 `Functions` 静态类，命名空间级比较运算符投影为 `operator_equal` 形式的静态方法。没有可用成员的类型保留类型身份并带 `[Obsolete]`。
 
-map（需具名 key/value 类型）、回调、variant 与自定义拥有型包装仍为 stub。缺少可解析拷贝构造或析构的 record 保持 stub。
+map（需具名 key/value 类型）、回调、variant 与自定义拥有型包装仍为 stub。非平凡可复制且缺少可解析拷贝构造的 record 保持 stub。
 
 ## 数据来源
 
