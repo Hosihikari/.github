@@ -29,12 +29,12 @@ Coverage counts come from the committed `coverage/manifest.jsonl` of each intero
 |---|---|---:|---:|---:|---:|---:|---:|
 | Endstone | Endstone headers | 1,968 | 1,825 | 143 | 268 | 92.7% | **81.6%** |
 | Bedrock (MCAPI) | 1.21.3.01 debug symbols and BDS headers | 76,578 | 42,289 | 34,289 | 4,051 | 55.2% | **52.4%** |
-| Bedrock (MCAPI, 1.26.51.1) | 1.26.51.1 header IR and LeviLamina headers | 100,896 | 83,813 | 17,083 | 581 | 83.1% | **82.6%** |
+| Bedrock (MCAPI, 1.26.51.1) | 1.26.51.1 header IR and LeviLamina headers | 100,918 | 85,293 | 15,625 | 582 | 84.5% | **84.0%** |
 | LeviLamina (LLAPI) | LeviLamina headers | 6,278 | 4,443 | 1,835 | 237 | 70.8% | **68.2%** |
 
 Bedrock projects 6,433 type declarations (6,221 classes, 211 structs, 1 union) and 704 enums; every one of the 5,952 discovered types that has both a symbol and a header declaration is selected, so symbol coverage for that set is complete — 57,731 of 57,731 symbols. Remaining MCAPI stubs are dominated by members with no symbol or vtable slot (15,602), constructors with no symbol (10,828), and classes with no accessible destructor (2,270).
 
-The 1.26.51.1 surface is emitted from 5,192 LeviLamina headers at commit `ee049f1dc`: 12,043 declarations project into 9,110 interop types and 135,927 shim functions. Members resolve at run time through `pl_resolve_symbol`: 41,099 of 65,760 mangled names resolve in the 1.26.51.1 server (62.5%), and 38,516 of the 52,561 name-resolving shim functions resolve (73.3%).
+The 1.26.51.1 surface is emitted from 5,194 LeviLamina headers at commit `ee049f1dc`: 12,045 declarations project into 9,112 interop types and 137,407 shim functions. Members resolve at run time through `pl_resolve_symbol`: 43,655 of 72,691 mangled names resolve in the 1.26.51.1 server (60.1%), and 35,987 of the 54,041 name-resolving shim functions resolve (66.6%).
 
 ### MCAPI symbol coverage (1.21.3.01)
 
@@ -64,7 +64,7 @@ LLAPI stubs are concentrated in template handling and ownership: inaccessible or
 
 ## Supported ABI
 
-Scalars and enum underlying types; `std::string` and `std::string_view` values and const references; single-level `T*` and `T&` as `void*`; by-value records through registers, the hidden return buffer, or a copy constructor resolved by name; `optional_ref<T>`, `std::vector<T>`, `std::optional<T>`, `std::shared_ptr<T>` and `std::weak_ptr<T>`; fields whose type is not projected surface their storage address as a readonly `nint`.
+Scalars and enum underlying types; `std::string` and `std::string_view` values and const references; single-level `T*` and `T&` as `void*`; by-value records through registers, the hidden return buffer, or a copy constructor resolved by name; by-value results whose spelling omits defaulted template arguments (`Bedrock::Result<T>`) bound to the recorded specialization; `optional_ref<T>`, `std::vector<T>`, `std::optional<T>`, `std::shared_ptr<T>` and `std::weak_ptr<T>`; fields whose type is not projected surface their storage address as a readonly `nint`.
 
 Enum declarations project as C# enums carrying their evaluated enumerators. Namespace-level functions — including carrier-exported out-of-line functions, which link through the carrier import library — become `Functions` static classes, and namespace-level comparison operators become static `operator_equal`-style methods. A type with no usable member keeps its type identity and carries `[Obsolete]`.
 
