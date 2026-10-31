@@ -29,12 +29,12 @@ Coverage counts come from the committed `coverage/manifest.jsonl` of each intero
 |---|---|---:|---:|---:|---:|---:|---:|
 | Endstone | Endstone headers | 1,968 | 1,825 | 143 | 268 | 92.7% | **81.6%** |
 | Bedrock (MCAPI) | 1.21.3.01 debug symbols and BDS headers | 76,578 | 42,289 | 34,289 | 4,051 | 55.2% | **52.4%** |
-| Bedrock (MCAPI, 1.26.51.1) | 1.26.51.1 header IR and LeviLamina headers | 100,991 | 85,617 | 15,374 | 582 | 84.8% | **84.3%** |
+| Bedrock (MCAPI, 1.26.51.1) | 1.26.51.1 header IR and LeviLamina headers | 100,991 | 88,314 | 12,677 | 582 | 87.4% | **87.0%** |
 | LeviLamina (LLAPI) | LeviLamina headers | 6,278 | 4,443 | 1,835 | 237 | 70.8% | **68.2%** |
 
 Bedrock projects 6,433 type declarations (6,221 classes, 211 structs, 1 union) and 704 enums; every one of the 5,952 discovered types that has both a symbol and a header declaration is selected, so symbol coverage for that set is complete — 57,731 of 57,731 symbols. Remaining MCAPI stubs are dominated by members with no symbol or vtable slot (15,602), constructors with no symbol (10,828), and classes with no accessible destructor (2,270).
 
-The 1.26.51.1 surface is emitted from 5,197 LeviLamina headers at commit `ee049f1dc`: 12,065 declarations project into 9,132 interop types and 137,720 shim functions. Members resolve at run time through `pl_resolve_symbol`: 43,655 of 72,744 mangled names resolve in the 1.26.51.1 server (60.0%), and 36,171 of the 54,345 name-resolving shim functions resolve (66.6%).
+The 1.26.51.1 surface is emitted from 5,197 LeviLamina headers at commit `ee049f1dc`: 12,065 declarations project into 9,132 interop types and 140,417 shim functions. Members resolve at run time through `pl_resolve_symbol`: 43,655 of 72,744 mangled names resolve in the 1.26.51.1 server (60.0%), and 36,172 of the 54,385 name-resolving shim functions resolve (66.5%).
 
 ### MCAPI symbol coverage (1.21.3.01)
 
